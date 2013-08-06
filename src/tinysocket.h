@@ -148,6 +148,19 @@ enum TINYSOCKET_ITEM(proto_type_t)
    TS_IPPROTO_UDP  = IPPROTO_UDP,
 };
 
+enum TINYSOCKET_ITEM(shutdown_type_t)
+{
+#ifdef TINYSOCKET_WINSOCK
+  TS_SHUT_RD   = SD_RECEIVE,
+  TS_SHUT_WR   = SD_SEND,
+  TS_SHUT_RDWR = SD_BOTH,
+#elseif TINYSOCKET_BSDSOCK
+  TS_SHUT_RD   = SHUT_RD,
+  TS_SHUT_WR   = SHUT_WR,
+  TS_SHUT_RDWR = SHUT_RDWR,
+#endif
+}
+
 #undef TINYSOCKET_EITEM
 
 
@@ -184,6 +197,10 @@ typedef
 typedef
    struct TINYSOCKET_NATIVE_ACCESS sockaddr_storage 
    TINYSOCKET_ITEM(sockaddr_storage_t);
+//  hostent
+typedef
+    struct hostent
+    hostent_t
 // pollfd_t
 typedef
 #ifdef TINYSOCKET_WINSOCK
@@ -246,6 +263,44 @@ TINYSOCKET_FUNCTION(int, close)(TINYSOCKET_ITEM(socket_t) sock)
 #elseif TINYSOCKET_BSDSOCK
    return TINYSOCKET_NATIVE_ACCESS close(sock);
 #endif
+}
+//shutdown
+TINYSOCKET_FUNCTION(int, shutdown)(TINYSOCKET_ITEM(socket_t) sock, int how)
+{
+   return TINYSOCKET_NATIVE_ACCESS shutdown(sock, how);
+}
+//getsockopt
+TINYSOCKET_FUNCTION(int, getsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, int optname, void * optval, int * optlen)
+{
+#ifdef TINYSOCKET_WINSOCK
+   return TINYSOCKET_NATIVE_ACCESS getsockopt(sock, level, optname, (char*)optval, optlen);
+#elseif TINYSOCKET_BSDSOCK
+   return TINYSOCKET_NATIVE_ACCESS getsockopt(sock, level, optname, optval, optlen);
+#endif
+}
+//setsockopt
+TINYSOCKET_FUNCTION(int, setsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, int optname, const void *optval, int optlen)
+{
+#ifdef TINYSOCKET_WINSOCK
+   return TINYSOCKET_NATIVE_ACCESS setsockopt(sock, level, optname, (const char*)optval, optlen);
+#elseif TINYSOCKET_BSDSOCK
+   return TINYSOCKET_NATIVE_ACCESS setsockopt(sock, level, optname, optval, optlen);
+#endif
+}
+//connect
+TINYSOCKET_FUNCTION(int, connect)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCKET_ITEM(sockaddr_t)* addr, int addrlen)
+{
+   return TINYSOCKET_NATIVE_ACCESS connect(sock, addr, addrlen);
+}
+//getpeername
+TINYSOCKET_FUNCTION(int, getpeername)(TINYSOCKET_ITEM(socket_t) sock, INYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
+{
+   return TINYSOCKET_NATIVE_ACCESS getpeername(sock, addr, addrlen);
+}
+//getsockname
+TINYSOCKET_FUNCTION(int, getsockname)(TINYSOCKET_ITEM(socket_t) sock, INYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
+{
+   return TINYSOCKET_NATIVE_ACCESS getsockname(sock, addr, addrlen);
 }
 //bind
 TINYSOCKET_FUNCTION(int, bind)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCKET_ITEM(sockaddr_t) *addr, int addrlen)
