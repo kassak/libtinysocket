@@ -10,9 +10,14 @@
 #ifdef TINYSOCKET_WINSOCK
    #include <Winsock2.h>
    #pragma comment(lib, "Ws2_32.lib")
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    #include <sys/types.h>
    #include <sys/socket.h>
+   #include <netinet/in.h>
+   #include <poll.h>
+   #include <errno.h>
+#else
+   #error "oups"
 #endif
 
 #ifndef TINYSOCKET_USER_PREFIX
@@ -22,12 +27,12 @@
 #endif
 
 #define TINYSOCKET_CONCAT2(X, Y) X##Y
-#define TINYSOCKET_CONCAT(X, Y) TINYSOCKET_CONCAT2(X) 
-#define TINYSOCKET_ITEM(X)  TINYSOCKET_CONCAT(TINYSOCKET_PREFIX, X) 
+#define TINYSOCKET_CONCAT(X, Y) TINYSOCKET_CONCAT2(X, Y)
+#define TINYSOCKET_ITEM(X)  TINYSOCKET_CONCAT(TINYSOCKET_PREFIX, X)
 #define TINYSOCKET_FUNCTION(RET, FOO) inline RET TINYSOCKET_ITEM(FOO)
 // In C there must be prefix in C++ there must be namespace
 // that is why native is called from global scope
-#ifdnef __cplusplus
+#ifndef __cplusplus
    #define TINYSOCKET_NATIVE_ACCESS
 #else
    #define TINYSOCKET_NATIVE_ACCESS ::
@@ -35,17 +40,17 @@
 
 // ==== CONSTANTS ====
 #ifdef TINYSOCKET_WINSOCK
-enum 
+enum
 {
   TS_SOCKET_ERROR = SOCKET_ERROR,
- 
+
 };
 
-#elseif TINYSOCKET_BSDSOCK
-enum 
+#elif defined(TINYSOCKET_BSDSOCK)
+enum
 {
   TS_SOCKET_ERROR = -1,
- 
+
 };
 #endif
 
@@ -53,14 +58,14 @@ enum TINYSOCKET_ITEM(poll_events_t)
 {
 #ifdef TINYSOCKET_WINSOCK
    TS_POLLIN   = POLLRDNORM,
-   TS_POLLPRI  = POLLPRI, 
+   TS_POLLPRI  = POLLPRI,
    TS_POLLOUT  = POLLWRNORM,
    TS_POLLERR  = POLLERR,
    TS_POLLHUP  = POLLHUP,
    TS_POLLNVAL = POLLNVAL,
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    TS_POLLIN   = POLLIN,
-   TS_POLLPRI  = POLLPRI, 
+   TS_POLLPRI  = POLLPRI,
    TS_POLLOUT  = POLLOUT,
    TS_POLLERR  = POLLERR,
    TS_POLLHUP  = POLLHUP,
@@ -70,7 +75,7 @@ enum TINYSOCKET_ITEM(poll_events_t)
 
 #ifdef TINYSOCKET_WINSOCK
    #define TINYSOCKET_EITEM(X) TS_##X = WSA##X,
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    #define TINYSOCKET_EITEM(X) TS_##X = X,
 #endif
 
@@ -108,7 +113,7 @@ enum TINYSOCKET_ITEM(errno_t)
    TINYSOCKET_EITEM(EHOSTDOWN)
    TINYSOCKET_EITEM(EHOSTUNREACH)
    TINYSOCKET_EITEM(ENOTEMPTY)
-   TINYSOCKET_EITEM(EPROCLIM)
+      //   TINYSOCKET_EITEM(EPROCLIM)
    TINYSOCKET_EITEM(EUSERS)
    TINYSOCKET_EITEM(EDQUOT)
    TINYSOCKET_EITEM(ESTALE)
@@ -154,7 +159,7 @@ enum TINYSOCKET_ITEM(shutdown_type_t)
   TS_SHUT_RD   = SD_RECEIVE,
   TS_SHUT_WR   = SD_SEND,
   TS_SHUT_RDWR = SD_BOTH,
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
   TS_SHUT_RD   = SHUT_RD,
   TS_SHUT_WR   = SHUT_WR,
   TS_SHUT_RDWR = SHUT_RDWR,
@@ -193,38 +198,30 @@ typedef
 typedef
    struct TINYSOCKET_NATIVE_ACCESS in6_addr
    TINYSOCKET_ITEM(in6_addr_t);
-// sockaddr_storage 
+// sockaddr_storage
 typedef
-   struct TINYSOCKET_NATIVE_ACCESS sockaddr_storage 
+   struct TINYSOCKET_NATIVE_ACCESS sockaddr_storage
    TINYSOCKET_ITEM(sockaddr_storage_t);
 //  hostent
 typedef
     struct hostent
-    hostent_t
+    hostent_t;
 // pollfd_t
 typedef
 #ifdef TINYSOCKET_WINSOCK
    TINYSOCKET_NATIVE_ACCESS WSAPOLLFD
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    struct TINYSOCKET_NATIVE_ACCESS pollfd
-#endif
-   TINYSOCKET_ITEM(pollfd_t);
-// nfds_t
-typedef
-#ifdef TINYSOCKET_WINSOCK
-   TINYSOCKET_NATIVE_ACCESS ULONG
-#elseif TINYSOCKET_BSDSOCK
-   TINYSOCKET_NATIVE_ACCESS nfds_t
 #endif
    TINYSOCKET_ITEM(pollfd_t);
 
 // ==== FUNCTIONS ====
 //errno
-TINYSOCKET_FUNCTION(int, errno)()
+TINYSOCKET_FUNCTION(int, last_error)()
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS WSAGetLastError();
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS errno;
 #endif
 }
@@ -236,7 +233,7 @@ TINYSOCKET_FUNCTION(int, init)()
    WORD wVersionRequested = MAKEWORD(2, 2);
    WSADATA wsaData;
    return TINYSOCKET_NATIVE_ACCESS WSAStartup(wVersionRequested, &wsaData);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return 0;
 #endif
 }
@@ -246,7 +243,7 @@ TINYSOCKET_FUNCTION(int, deinit)()
 #ifdef TINYSOCKET_WINSOCK
    //let's fuck M$ together
    return TINYSOCKET_NATIVE_ACCESS WSACleanup();
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return 0;
 #endif
 }
@@ -260,7 +257,7 @@ TINYSOCKET_FUNCTION(int, close)(TINYSOCKET_ITEM(socket_t) sock)
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS closesocket(sock);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS close(sock);
 #endif
 }
@@ -274,7 +271,7 @@ TINYSOCKET_FUNCTION(int, getsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, 
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS getsockopt(sock, level, optname, (char*)optval, optlen);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS getsockopt(sock, level, optname, optval, optlen);
 #endif
 }
@@ -283,7 +280,7 @@ TINYSOCKET_FUNCTION(int, setsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, 
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS setsockopt(sock, level, optname, (const char*)optval, optlen);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS setsockopt(sock, level, optname, optval, optlen);
 #endif
 }
@@ -293,12 +290,12 @@ TINYSOCKET_FUNCTION(int, connect)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCK
    return TINYSOCKET_NATIVE_ACCESS connect(sock, addr, addrlen);
 }
 //getpeername
-TINYSOCKET_FUNCTION(int, getpeername)(TINYSOCKET_ITEM(socket_t) sock, INYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
+TINYSOCKET_FUNCTION(int, getpeername)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS getpeername(sock, addr, addrlen);
 }
 //getsockname
-TINYSOCKET_FUNCTION(int, getsockname)(TINYSOCKET_ITEM(socket_t) sock, INYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
+TINYSOCKET_FUNCTION(int, getsockname)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS getsockname(sock, addr, addrlen);
 }
@@ -318,11 +315,11 @@ TINYSOCKET_FUNCTION(int, accept)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM
    return TINYSOCKET_NATIVE_ACCESS accept(sock, addr, addrlen);
 }
 //poll
-TINYSOCKET_FUNCTION(int, poll)(pollfd_t *fds, TINYSOCKET_ITEM(nfds_t) nfds, int timeout)
+TINYSOCKET_FUNCTION(int, poll)(TINYSOCKET_ITEM(pollfd_t) *fds, int nfds, int timeout)
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS WSAPoll(fds, nfds, timeout);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS poll(fds, nfds, timeout);
 #endif
 }
@@ -331,7 +328,7 @@ TINYSOCKET_FUNCTION(int, recv)(TINYSOCKET_ITEM(socket_t) sock, void * buf, size_
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS recv(sock, (char*)buf, len, flags);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS recv(sock, buf, len, flags);
 #endif
 }
@@ -340,7 +337,7 @@ TINYSOCKET_FUNCTION(int, send)(TINYSOCKET_ITEM(socket_t) sock, const void * buf,
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS send(sock, (char*)buf, len, flags);
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    return TINYSOCKET_NATIVE_ACCESS send(sock, buf, len, flags);
 #endif
 }
