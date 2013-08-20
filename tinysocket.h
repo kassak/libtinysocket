@@ -39,20 +39,15 @@
 #endif
 
 // ==== CONSTANTS ====
+enum
+{
 #ifdef TINYSOCKET_WINSOCK
-enum
-{
   TS_SOCKET_ERROR = SOCKET_ERROR,
-
-};
-
 #elif defined(TINYSOCKET_BSDSOCK)
-enum
-{
   TS_SOCKET_ERROR = -1,
-
-};
 #endif
+  TS_NO_ERROR = 0,
+};
 
 enum TINYSOCKET_ITEM(poll_events_t)
 {
