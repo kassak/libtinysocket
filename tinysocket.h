@@ -347,6 +347,15 @@ TINYSOCKET_FUNCTION(int, write)(TINYSOCKET_ITEM(socket_t) sock, const void * buf
    return TINYSOCKET_ITEM(send)(sock, buf, len, 0);
 }
 
+
+//CUSTOM
+TINYSOCKET_FUNCTION(int, is_recoverable)()
+{
+   return TINYSOCKET_ITEM(last_error)() == TS_EWOULDBLOCK
+       || TINYSOCKET_ITEM(last_error)() == TS_EAGAIN;
+}
+
+
 #undef TINYSOCKET_PREFIX
 #undef TINYSOCKET_CONCAT
 #undef TINYSOCKET_CONCAT2
