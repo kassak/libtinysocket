@@ -29,7 +29,7 @@
 #define TINYSOCKET_CONCAT2(X, Y) X##Y
 #define TINYSOCKET_CONCAT(X, Y) TINYSOCKET_CONCAT2(X, Y)
 #define TINYSOCKET_ITEM(X)  TINYSOCKET_CONCAT(TINYSOCKET_PREFIX, X)
-#define TINYSOCKET_FUNCTION(RET, FOO) inline RET TINYSOCKET_ITEM(FOO)
+#define TINYSOCKET_FUNCTION(RET, FOO) static inline RET TINYSOCKET_ITEM(FOO)
 // In C there must be prefix in C++ there must be namespace
 // that is why native is called from global scope
 #ifndef __cplusplus
@@ -76,6 +76,7 @@ enum TINYSOCKET_ITEM(poll_events_t)
 
 enum TINYSOCKET_ITEM(errno_t)
 {
+   TINYSOCKET_EITEM(EAGAIN)
    TINYSOCKET_EITEM(EWOULDBLOCK)
    TINYSOCKET_EITEM(EINPROGRESS)
    TINYSOCKET_EITEM(EALREADY)
