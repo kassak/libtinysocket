@@ -16,6 +16,7 @@
    #include <arpa/inet.h>
    #include <netinet/in.h>
    #include <poll.h>
+   #include <unistd.h>
    #include <errno.h>
 #else
    #error "oups"
