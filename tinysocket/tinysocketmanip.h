@@ -136,6 +136,11 @@ TINYSOCKET_FUNCTION(int, write)(TINYSOCKET_ITEM(socket_t) sock, const void * buf
 {
    return TINYSOCKET_ITEM(send)(sock, buf, len, 0);
 }
+//fcntl
+TINYSOCKET_FUNCTION(int, fcntl)(TINYSOCKET_ITEM(socket_t) sock, int cmd, int arg)
+{
+   return TINYSOCKET_NATIVE_ACCESS fcntl(sock, cmd, arg);
+}
 
 
 #endif //TINYSOCKETMANIP_H

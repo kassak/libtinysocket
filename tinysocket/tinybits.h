@@ -11,6 +11,16 @@ enum
   TS_NO_ERROR = 0,
 };
 
+enum TINYSOCKET_ITEM(fcntl_cmds_t)
+{
+   TS_F_SETFL = F_SETFL,
+};
+
+enum TINYSOCKET_ITEM(sflags_t)
+{
+   TS_O_NONBLOCK = O_NONBLOCK,
+};
+
 enum TINYSOCKET_ITEM(poll_events_t)
 {
 #ifdef TINYSOCKET_WINSOCK

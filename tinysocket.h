@@ -18,6 +18,7 @@
    #include <poll.h>
    #include <unistd.h>
    #include <errno.h>
+   #include <fcntl.h>
 #else
    #error "oups"
 #endif
@@ -58,7 +59,6 @@ TINYSOCKET_FUNCTION(int, is_recoverable)()
    return TINYSOCKET_ITEM(last_error)() == TS_EWOULDBLOCK
        || TINYSOCKET_ITEM(last_error)() == TS_EAGAIN;
 }
-
 
 #undef TINYSOCKET_PREFIX
 #undef TINYSOCKET_CONCAT
