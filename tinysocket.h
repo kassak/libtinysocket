@@ -42,11 +42,11 @@
    #define TINYSOCKET_NATIVE_ACCESS ::
 #endif
 
-// ==== CONSTANTS ====
-#include "tinysocket/tinybits.h"
-
 // ==== TYPES ====
 #include "tinysocket/tinytypes.h"
+
+// ==== CONSTANTS ====
+#include "tinysocket/tinybits.h"
 
 // ==== FUNCTIONS ====
 #include "tinysocket/tinysocketmanip.h"

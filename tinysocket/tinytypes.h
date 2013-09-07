@@ -5,7 +5,7 @@
 typedef
 #ifdef TINYSOCKET_WINSOCK
    SOCKET
-#elseif TINYSOCKET_BSDSOCK
+#elif defined(TINYSOCKET_BSDSOCK)
    int
 #endif
    TINYSOCKET_ITEM(socket_t);

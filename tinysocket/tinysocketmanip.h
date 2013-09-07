@@ -52,7 +52,7 @@ TINYSOCKET_FUNCTION(int, shutdown)(TINYSOCKET_ITEM(socket_t) sock, int how)
    return TINYSOCKET_NATIVE_ACCESS shutdown(sock, how);
 }
 //getsockopt
-TINYSOCKET_FUNCTION(int, getsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, int optname, void * optval, int * optlen)
+TINYSOCKET_FUNCTION(int, getsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, int optname, void * optval, unsigned int * optlen)
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS getsockopt(sock, level, optname, (char*)optval, optlen);
@@ -61,7 +61,7 @@ TINYSOCKET_FUNCTION(int, getsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, 
 #endif
 }
 //setsockopt
-TINYSOCKET_FUNCTION(int, setsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, int optname, const void *optval, int optlen)
+TINYSOCKET_FUNCTION(int, setsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, int optname, const void *optval, unsigned int optlen)
 {
 #ifdef TINYSOCKET_WINSOCK
    return TINYSOCKET_NATIVE_ACCESS setsockopt(sock, level, optname, (const char*)optval, optlen);
@@ -70,22 +70,22 @@ TINYSOCKET_FUNCTION(int, setsockopt)(TINYSOCKET_ITEM(socket_t) sock, int level, 
 #endif
 }
 //connect
-TINYSOCKET_FUNCTION(int, connect)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCKET_ITEM(sockaddr_t)* addr, int addrlen)
+TINYSOCKET_FUNCTION(int, connect)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCKET_ITEM(sockaddr_t)* addr, unsigned int addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS connect(sock, addr, addrlen);
 }
 //getpeername
-TINYSOCKET_FUNCTION(int, getpeername)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
+TINYSOCKET_FUNCTION(int, getpeername)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) * addr, unsigned int * addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS getpeername(sock, addr, addrlen);
 }
 //getsockname
-TINYSOCKET_FUNCTION(int, getsockname)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) * addr, int * addrlen)
+TINYSOCKET_FUNCTION(int, getsockname)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) * addr, unsigned int * addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS getsockname(sock, addr, addrlen);
 }
 //bind
-TINYSOCKET_FUNCTION(int, bind)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCKET_ITEM(sockaddr_t) *addr, int addrlen)
+TINYSOCKET_FUNCTION(int, bind)(TINYSOCKET_ITEM(socket_t) sock, const TINYSOCKET_ITEM(sockaddr_t) *addr, unsigned int addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS bind(sock, addr, addrlen);
 }
@@ -95,7 +95,7 @@ TINYSOCKET_FUNCTION(int, listen)(TINYSOCKET_ITEM(socket_t) sock, int backlog)
    return TINYSOCKET_NATIVE_ACCESS listen(sock, backlog);
 }
 //accept
-TINYSOCKET_FUNCTION(int, accept)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) *addr, int *addrlen)
+TINYSOCKET_FUNCTION(int, accept)(TINYSOCKET_ITEM(socket_t) sock, TINYSOCKET_ITEM(sockaddr_t) *addr, unsigned int *addrlen)
 {
    return TINYSOCKET_NATIVE_ACCESS accept(sock, addr, addrlen);
 }

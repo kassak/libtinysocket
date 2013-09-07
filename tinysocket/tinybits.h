@@ -1,14 +1,14 @@
 #ifndef TINYBITS_H
 #define TINYBITS_H
 
+#ifdef TINYSOCKET_WINSOCK
+   static const TINYSOCKET_ITEM(socket_t) TS_SOCKET_ERROR = (TINYSOCKET_ITEM(socket_t))SOCKET_ERROR;
+#elif defined(TINYSOCKET_BSDSOCK)
+   static const TINYSOCKET_ITEM(socket_t) TS_SOCKET_ERROR = (TINYSOCKET_ITEM(socket_t))-1;
+#endif
 enum
 {
-#ifdef TINYSOCKET_WINSOCK
-  TS_SOCKET_ERROR = SOCKET_ERROR,
-#elif defined(TINYSOCKET_BSDSOCK)
-  TS_SOCKET_ERROR = -1,
-#endif
-  TS_NO_ERROR = 0,
+   TS_NO_ERROR = 0,
 };
 
 enum TINYSOCKET_ITEM(fcntl_cmds_t)
@@ -132,7 +132,7 @@ enum TINYSOCKET_ITEM(shutdown_type_t)
   TS_SHUT_WR   = SHUT_WR,
   TS_SHUT_RDWR = SHUT_RDWR,
 #endif
-}
+};
 
 #undef TINYSOCKET_EITEM
 
