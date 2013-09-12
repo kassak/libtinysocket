@@ -60,6 +60,29 @@ TINYSOCKET_FUNCTION(int, is_recoverable)()
        || TINYSOCKET_ITEM(last_error)() == TS_EAGAIN;
 }
 
+TINYSOCKET_FUNCTION(int, v4v6_inet_pton)(const char * s, TINYSOCKET_ITEM(sockaddr_storage_t) * stor)
+{
+   if(1 == tinsock_inet_pton(TS_AF_INET6, s, &((TINYSOCKET_ITEM(sockaddr_in6_t)*)stor)->sin6_addr))
+   {
+      stor->ss_family = TS_AF_INET6;
+   }
+   else if(1 == tinsock_inet_pton(TS_AF_INET, s, &((TINYSOCKET_ITEM(sockaddr_in_t)*)stor)->sin_addr))
+   {
+      stor->ss_family = TS_AF_INET;
+   }
+   else
+      return 0;
+   return 1;
+}
+
+TINYSOCKET_FUNCTION(void, v4v6_set_port)(TINYSOCKET_ITEM(sockaddr_storage_t) * stor, uint16_t port)
+{
+   if(stor->ss_family == TS_AF_INET6)
+      ((TINYSOCKET_ITEM(sockaddr_in6_t)*)stor)->sin6_port = port;
+   else if(stor->ss_family == TS_AF_INET)
+      ((TINYSOCKET_ITEM(sockaddr_in_t)*)stor)->sin_port = port;
+}
+
 #undef TINYSOCKET_PREFIX
 #undef TINYSOCKET_CONCAT
 #undef TINYSOCKET_CONCAT2
